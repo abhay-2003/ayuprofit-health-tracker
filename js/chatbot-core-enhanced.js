@@ -126,11 +126,73 @@ class FitnessAssistant {
         };
     }
 
-    // Process user message and generate response
-    processMessage(message) {
+    initialize() {
+        const chatForm = document.getElementById('chat-form');
+        const chatInput = document.getElementById('chat-input');
+        
+        if (chatForm && chatInput) {
+            chatForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const message = chatInput.value.trim();
+                if (message) {
+                    this.displayMessage('user', message);
+                    const response = this.getResponse(message);
+                    this.displayMessage('bot', response);
+                    chatInput.value = '';
+                }
+            });
+        }
+    }
+
+    getResponse(message) {
         // Update context
         this.context.lastMessage = message;
         this.context.conversation.push({ role: 'user', content: message });
+
+        // Detect topic
+        const topic = this.detectTopic(message.toLowerCase());
+        this.context.currentTopic = topic;
+
+        // Generate response based on topic
+        let response;
+        if (!topic) {
+            response = this.getRandomResponse(this.responses.fallback);
+        } else if (topic === 'greeting') {
+            response = this.getRandomResponse(this.responses.greeting);
+        } else {
+            response = this.getRandomResponse(this.responses[topic].general);
+        }
+
+        return response;
+    }
+
+    detectTopic(message) {
+        if (message.match(/^(hi|hello|hey|greetings)/i)) {
+            return 'greeting';
+        }
+
+        for (const [topic, keywords] of Object.entries(this.topics)) {
+            if (keywords.some(keyword => message.includes(keyword))) {
+                return topic;
+            }
+        }
+        return null;
+    }
+
+    getRandomResponse(responses) {
+        return responses[Math.floor(Math.random() * responses.length)];
+    }
+
+    displayMessage(role, content) {
+        const chatMessages = document.getElementById('chat-messages');
+        if (chatMessages) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}-message`;
+            messageDiv.textContent = content;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    }
 
         // Determine message type and topic
         const topic = this.determineMessageTopic(message);

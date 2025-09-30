@@ -12,6 +12,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <!-- Calendar -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js"></script>
+    <!-- Food API -->
+    <script src="https://cdn.jsdelivr.net/npm/@edamam-api/edamam-api@1.0.5/dist/edamam-api.min.js"></script>
     <!-- Custom styles -->
     <style>
         :root {
@@ -48,55 +50,6 @@
             max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
-        }
-        #chat-messages {
-            height: 300px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-        }
-        .message {
-            margin: 10px 0;
-            padding: 10px;
-            border-radius: 8px;
-            max-width: 80%;
-            word-wrap: break-word;
-        }
-        .user-message {
-            background-color: var(--ayuprofit-primary);
-            color: white;
-            margin-left: auto;
-        }
-        .bot-message {
-            background-color: #f0f0f0;
-            margin-right: auto;
-        }
-        #chat-messages {
-            height: 300px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-        }
-        .message {
-            margin: 10px 0;
-            padding: 10px;
-            border-radius: 8px;
-            max-width: 80%;
-            word-wrap: break-word;
-        }
-        .user-message {
-            background-color: var(--ayuprofit-primary);
-            color: white;
-            margin-left: auto;
-        }
-        .bot-message {
-            background-color: #f0f0f0;
-            margin-right: auto;
-        }
         }
         .section-card {
             background: white;
@@ -630,10 +583,5 @@
             localStorage.setItem('waterIntake', state.waterIntake.toString());
         });
     </script>
-    <!-- Core Application Scripts -->
-    <script src="js/exercise-database.js"></script>
-    <script src="js/foodDatabase.js"></script>
-    <script src="js/chatbot-core-enhanced.js"></script>
-    <script src="js/fitness-app-enhanced.js"></script>
 </body>
 </html>

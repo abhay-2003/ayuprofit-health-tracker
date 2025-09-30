@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayuprofit Fitness Assistant</title>
+    <style>
+        /* Base Styles */
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f2f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 20px;
+        }
+
+        .sidebar {
+            width: 350px;
+        }
+
+        /* Card Styles */
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+
+        /* Meal Tracking Styles */
+        .meal-section {
+            margin-bottom: 20px;
+        }
+
+        .meal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .meal-items {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+
+        .food-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+
+        .meal-total {
+            background: #f1f8fe;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        /* Progress Tracking Styles */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .metric-card h3 {
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+        }
+
+        .macro-progress {
+            margin: 15px 0;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 5px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #3498db;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        /* Summary Stats */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <!-- Profile Section -->
+            <div class="card" id="profile-section">
+                <h2>Your Profile</h2>
+                <form id="profile-form">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="age">Age</label>
+                        <input type="number" id="age" required min="13" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">Gender</label>
+                        <select id="gender" required>
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="weight">Weight (kg)</label>
+                        <input type="number" id="weight" required step="0.1" min="30" max="250">
+                    </div>
+                    <div class="form-group">
+                        <label for="height">Height (cm)</label>
+                        <input type="number" id="height" required step="0.1" min="100" max="250">
+                    </div>
+                    <div class="form-group">
+                        <label for="activity">Activity Level</label>
+                        <select id="activity" required>
+                            <option value="1.2">Sedentary (little/no exercise)</option>
+                            <option value="1.375">Lightly active (1-3 days/week)</option>
+                            <option value="1.55">Moderately active (3-5 days/week)</option>
+                            <option value="1.725">Very active (6-7 days/week)</option>
+                            <option value="1.9">Extra active (very active & physical job)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="goal">Fitness Goal</label>
+                        <select id="goal" required>
+                            <option value="lose">Lose Weight</option>
+                            <option value="maintain">Maintain Weight</option>
+                            <option value="gain">Gain Muscle</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn">Save Profile</button>
+                </form>
+            </div>
+
+            <!-- Current Stats -->
+            <div class="card" id="current-stats">
+                <h2>Current Stats</h2>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <h3>BMI</h3>
+                        <div class="stat-value" id="bmi">-</div>
+                        <div class="stat-label" id="bmi-category">-</div>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Daily Calories</h3>
+                        <div class="stat-value" id="tdee">-</div>
+                        <div class="stat-label">TDEE</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Meal Tracking -->
+            <div class="card">
+                <h2>Meal Tracking</h2>
+                <!-- Food Entry Form -->
+                <form id="food-form" class="form-group">
+                    <div class="form-group">
+                        <label for="food">Food Item</label>
+                        <input type="text" id="food" list="food-list" required>
+                        <datalist id="food-list"></datalist>
+                    </div>
+                    <div class="form-group">
+                        <label for="portion">Portion (g)</label>
+                        <input type="number" id="portion" required min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="meal-time">Meal</label>
+                        <select id="meal-time" required>
+                            <option value="breakfast">Breakfast</option>
+                            <option value="lunch">Lunch</option>
+                            <option value="dinner">Dinner</option>
+                            <option value="snacks">Snacks</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn">Add Food</button>
+                </form>
+
+                <!-- Meal Summaries -->
+                <div class="meal-sections">
+                    <div class="meal-section" id="breakfast-section">
+                        <div class="meal-header">
+                            <h3>Breakfast</h3>
+                            <div class="meal-total" id="breakfast-total">0 cal | P: 0g | C: 0g | F: 0g</div>
+                        </div>
+                        <div class="meal-items" id="breakfast-items"></div>
+                    </div>
+
+                    <div class="meal-section" id="lunch-section">
+                        <div class="meal-header">
+                            <h3>Lunch</h3>
+                            <div class="meal-total" id="lunch-total">0 cal | P: 0g | C: 0g | F: 0g</div>
+                        </div>
+                        <div class="meal-items" id="lunch-items"></div>
+                    </div>
+
+                    <div class="meal-section" id="dinner-section">
+                        <div class="meal-header">
+                            <h3>Dinner</h3>
+                            <div class="meal-total" id="dinner-total">0 cal | P: 0g | C: 0g | F: 0g</div>
+                        </div>
+                        <div class="meal-items" id="dinner-items"></div>
+                    </div>
+
+                    <div class="meal-section" id="snacks-section">
+                        <div class="meal-header">
+                            <h3>Snacks</h3>
+                            <div class="meal-total" id="snacks-total">0 cal | P: 0g | C: 0g | F: 0g</div>
+                        </div>
+                        <div class="meal-items" id="snacks-items"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exercise Tracking -->
+            <div class="card">
+                <h2>Exercise Tracking</h2>
+                <form id="exercise-form">
+                    <div class="form-group">
+                        <label for="exercise">Exercise</label>
+                        <input type="text" id="exercise" list="exercise-list" required>
+                        <datalist id="exercise-list"></datalist>
+                    </div>
+                    <div class="form-group">
+                        <label for="duration">Duration (minutes)</label>
+                        <input type="number" id="duration" required min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="intensity">Intensity</label>
+                        <select id="intensity" required>
+                            <option value="low">Low</option>
+                            <option value="moderate">Moderate</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn">Add Exercise</button>
+                </form>
+                <div class="exercise-log" id="exercise-items"></div>
+            </div>
+
+            <!-- Daily Summary -->
+            <div class="card">
+                <h2>Daily Summary</h2>
+                <div class="summary-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="calories-consumed">0</div>
+                        <div class="stat-label">Calories Consumed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="calories-burned">0</div>
+                        <div class="stat-label">Calories Burned</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="net-calories">0</div>
+                        <div class="stat-label">Net Calories</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="calories-remaining">0</div>
+                        <div class="stat-label">Calories Remaining</div>
+                    </div>
+                </div>
+
+                <h3>Macronutrients</h3>
+                <div class="macro-progress">
+                    <div id="protein-progress">
+                        <div class="macro-label">
+                            <span>Protein</span>
+                            <span>0g / 0g</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div id="carbs-progress">
+                        <div class="macro-label">
+                            <span>Carbs</span>
+                            <span>0g / 0g</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div id="fat-progress">
+                        <div class="macro-label">
+                            <span>Fat</span>
+                            <span>0g / 0g</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Tracking -->
+            <div class="card">
+                <h2>Progress Tracking</h2>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <h3>Starting Weight</h3>
+                        <div class="stat-value" id="starting-weight">-</div>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Current Weight</h3>
+                        <div class="stat-value" id="current-weight">-</div>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Weight Goal</h3>
+                        <div class="stat-value" id="weight-goal">-</div>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Progress</h3>
+                        <div class="stat-value" id="weight-change">-</div>
+                        <div class="stat-label" id="progress-status">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/foodDatabase.js"></script>
+    <script src="js/exerciseDatabase.js"></script>
+    <script>
+        // Initialize foodDatabase if not defined
+        if (typeof foodDatabase === 'undefined') {
+            foodDatabase = {
+                'egg': { calories: 68, protein: 5.7, carbs: 0.6, fat: 4.8 },
+                'milk': { calories: 42, protein: 3.4, carbs: 5, fat: 1 },
+                'bread': { calories: 265, protein: 9, carbs: 49, fat: 3.2 },
+                'rice': { calories: 130, protein: 2.7, carbs: 28, fat: 0.3 },
+                'chicken breast': { calories: 165, protein: 31, carbs: 0, fat: 3.6 },
+                'banana': { calories: 89, protein: 1.1, carbs: 23, fat: 0.3 }
+            };
+        }
+
+        // Initialize exerciseDatabase if not defined
+        if (typeof exerciseDatabase === 'undefined') {
+            exerciseDatabase = {
+                'walking': { met: 3.5 },
+                'running': { met: 8.3 },
+                'cycling': { met: 7.5 },
+                'swimming': { met: 6.0 }
+            };
+        }
+    </script>
+    <script src="js/fitness-tracker.js"></script>
+</body>
+</html>

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Tracker & Assistant</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .vh-100 {
+            height: 100vh;
+        }
+        .chat-messages {
+            height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+        .message {
+            margin: 10px;
+            padding: 10px 15px;
+            border-radius: 15px;
+            max-width: 80%;
+        }
+        .user-message {
+            background: #007bff;
+            color: white;
+            margin-left: auto;
+        }
+        .bot-message {
+            background: #e9ecef;
+            margin-right: auto;
+        }
+        .meal-card, .exercise-card {
+            margin-bottom: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .progress-section {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Profile Section -->
+            <div class="col-md-3 p-3 border-end vh-100 overflow-auto">
+                <div class="mb-4">
+                    <h4><i class="bi bi-person-circle"></i> Profile</h4>
+                    <form id="profile-form">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="age" class="form-label">Age</label>
+                            <input type="number" class="form-control" id="age" min="15" max="100" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="gender" class="form-label">Gender</label>
+                            <select class="form-select" id="gender" required>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="weight" class="form-label">Weight (kg)</label>
+                            <input type="number" class="form-control" id="weight" step="0.1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="height" class="form-label">Height (cm)</label>
+                            <input type="number" class="form-control" id="height" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="activity" class="form-label">Activity Level</label>
+                            <select class="form-select" id="activity" required>
+                                <option value="1.2">Sedentary (little or no exercise)</option>
+                                <option value="1.375">Lightly active (1-3 days/week)</option>
+                                <option value="1.55">Moderately active (3-5 days/week)</option>
+                                <option value="1.725">Very active (6-7 days/week)</option>
+                                <option value="1.9">Extra active (very hard exercise & physical job)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="goal" class="form-label">Fitness Goal</label>
+                            <select class="form-select" id="goal" required>
+                                <option value="maintain">Maintain Weight</option>
+                                <option value="lose">Lose Weight</option>
+                                <option value="gain">Gain Muscle</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Save Profile</button>
+                    </form>
+                </div>
+
+                <div class="stats-section">
+                    <h4 class="mb-3"><i class="bi bi-graph-up"></i> Today's Stats</h4>
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-2 text-muted">BMI</h6>
+                            <p class="card-text">
+                                <span id="bmi" class="h4">-</span>
+                                <small class="text-muted" id="bmi-category">-</small>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-2 text-muted">Daily Calories</h6>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span>Goal:</span>
+                                <span id="calorie-goal" class="fw-bold">-</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span>Consumed:</span>
+                                <span id="calories-consumed" class="fw-bold text-success">-</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span>Burned:</span>
+                                <span id="calories-burned" class="fw-bold text-danger">-</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>Remaining:</span>
+                                <span id="calories-remaining" class="fw-bold">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    <canvas id="calories-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-6 p-3 vh-100 overflow-auto">
+                <ul class="nav nav-tabs mb-3" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#meals">
+                            <i class="bi bi-egg-fried"></i> Meals
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#exercise">
+                            <i class="bi bi-activity"></i> Exercise
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#progress">
+                            <i class="bi bi-graph-up"></i> Progress
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <!-- Meals Tab -->
+                    <div class="tab-pane fade show active" id="meals">
+                        <form id="food-form" class="mb-4">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="food" class="form-label">Food Item</label>
+                                    <input type="text" class="form-control" id="food" list="food-list" required>
+                                    <datalist id="food-list"></datalist>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="portion" class="form-label">Portion (g)</label>
+                                    <input type="number" class="form-control" id="portion" min="1" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="meal-time" class="form-label">Meal</label>
+                                    <select class="form-select" id="meal-time" required>
+                                        <option value="breakfast">Breakfast</option>
+                                        <option value="lunch">Lunch</option>
+                                        <option value="dinner">Dinner</option>
+                                        <option value="snacks">Snacks</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary mt-3">Add Food</button>
+                        </form>
+
+                        <div class="accordion" id="mealsAccordion">
+                            <!-- Breakfast -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#breakfast-collapse">
+                                        Breakfast
+                                    </button>
+                                </h2>
+                                <div id="breakfast-collapse" class="accordion-collapse collapse show">
+                                    <div class="accordion-body">
+                                        <div id="breakfast-items"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Lunch -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#lunch-collapse">
+                                        Lunch
+                                    </button>
+                                </h2>
+                                <div id="lunch-collapse" class="accordion-collapse collapse">
+                                    <div class="accordion-body">
+                                        <div id="lunch-items"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Dinner -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#dinner-collapse">
+                                        Dinner
+                                    </button>
+                                </h2>
+                                <div id="dinner-collapse" class="accordion-collapse collapse">
+                                    <div class="accordion-body">
+                                        <div id="dinner-items"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Snacks -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#snacks-collapse">
+                                        Snacks
+                                    </button>
+                                </h2>
+                                <div id="snacks-collapse" class="accordion-collapse collapse">
+                                    <div class="accordion-body">
+                                        <div id="snacks-items"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Exercise Tab -->
+                    <div class="tab-pane fade" id="exercise">
+                        <form id="exercise-form" class="mb-4">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="exercise" class="form-label">Exercise</label>
+                                    <input type="text" class="form-control" id="exercise" list="exercise-list" required>
+                                    <datalist id="exercise-list"></datalist>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="duration" class="form-label">Duration (min)</label>
+                                    <input type="number" class="form-control" id="duration" min="1" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="intensity" class="form-label">Intensity</label>
+                                    <select class="form-select" id="intensity" required>
+                                        <option value="low">Low</option>
+                                        <option value="moderate">Moderate</option>
+                                        <option value="high">High</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary mt-3">Add Exercise</button>
+                        </form>
+
+                        <div id="exercise-items"></div>
+                    </div>
+
+                    <!-- Progress Tab -->
+                    <div class="tab-pane fade" id="progress">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="progress-section">
+                                    <h5>Weight Progress</h5>
+                                    <canvas id="weight-chart"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="progress-section">
+                                    <h5>Calorie Trends</h5>
+                                    <canvas id="calories-trend-chart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="progress-section">
+                                    <h5>Macronutrient Distribution</h5>
+                                    <canvas id="macros-chart"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="progress-section">
+                                    <h5>Exercise Activity</h5>
+                                    <canvas id="exercise-chart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chatbot Section -->
+            <div class="col-md-3 p-3 border-start vh-100 d-flex flex-column">
+                <h4 class="mb-3"><i class="bi bi-chat-dots"></i> Fitness Assistant</h4>
+                <div id="chat-messages" class="flex-grow-1 overflow-auto mb-3 border rounded bg-white"></div>
+                <div class="input-group">
+                    <input type="text" id="user-input" class="form-control" placeholder="Ask me anything...">
+                    <button class="btn btn-primary" type="button" onclick="sendMessage()">
+                        <i class="bi bi-send"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Application Scripts -->
+    <script src="js/foodDatabase.js"></script>
+    <script src="js/exerciseDatabase.js"></script>
+    <script src="js/chatbot-core.js"></script>
+</body>
+</html>

@@ -10,6 +10,39 @@ class FitnessAssistant {
         
         // Initialize the chatbot when constructed
         this.initialize();
+        
+        // Bind event handlers
+        this.handleUserMessage = this.handleUserMessage.bind(this);
+    }
+
+    initialize() {
+        // Set up event listeners for the chat interface
+        const chatForm = document.getElementById('chat-form');
+        if (chatForm) {
+            chatForm.addEventListener('submit', this.handleUserMessage);
+        }
+    }
+
+    handleUserMessage(event) {
+        event.preventDefault();
+        const messageInput = document.getElementById('chat-input');
+        const message = messageInput.value.trim();
+        
+        if (message) {
+            this.displayMessage('user', message);
+            const response = this.processMessage(message);
+            this.displayMessage('bot', response);
+            messageInput.value = '';
+        }
+    }
+
+    displayMessage(role, content) {
+        const chatMessages = document.getElementById('chat-messages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = role === 'user' ? 'message user-message' : 'message bot-message';
+        messageDiv.textContent = content;
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
 
         // Topics the assistant can handle
         this.topics = {

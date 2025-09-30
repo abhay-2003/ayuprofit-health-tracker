@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Tracker</title>
+    <style>
+        /* Base styles */
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        /* Meal sections */
+        .meal-section {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .food-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* Progress bars */
+        .macro-progress {
+            margin-bottom: 15px;
+        }
+
+        .macro-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #4CAF50;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Profile Section -->
+        <div class="sidebar">
+            <div class="card">
+                <h2>Profile</h2>
+                <form id="profile-form">
+                    <div class="form-group">
+                        <label for="name">Name:</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="age">Age:</label>
+                        <input type="number" id="age" required min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">Gender:</label>
+                        <select id="gender" required>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="weight">Weight (kg):</label>
+                        <input type="number" id="weight" required step="0.1" min="20">
+                    </div>
+                    <div class="form-group">
+                        <label for="height">Height (cm):</label>
+                        <input type="number" id="height" required min="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="activity">Activity Level:</label>
+                        <select id="activity" required>
+                            <option value="1.2">Sedentary</option>
+                            <option value="1.375">Lightly Active</option>
+                            <option value="1.55">Moderately Active</option>
+                            <option value="1.725">Very Active</option>
+                            <option value="1.9">Extra Active</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="goal">Goal:</label>
+                        <select id="goal" required>
+                            <option value="lose">Lose Weight</option>
+                            <option value="maintain">Maintain Weight</option>
+                            <option value="gain">Gain Weight</option>
+                        </select>
+                    </div>
+                    <button type="submit">Save Profile</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>Stats</h2>
+                <div>
+                    <p>BMI: <span id="bmi">-</span></p>
+                    <p>Category: <span id="bmi-category">-</span></p>
+                    <p>TDEE: <span id="tdee">-</span> calories/day</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Food Tracking -->
+            <div class="card">
+                <h2>Food Tracking</h2>
+                <form id="food-form">
+                    <div class="form-group">
+                        <label for="food">Food Item:</label>
+                        <input type="text" id="food" list="food-list" required>
+                        <datalist id="food-list"></datalist>
+                    </div>
+                    <div class="form-group">
+                        <label for="portion">Portion (g):</label>
+                        <input type="number" id="portion" required min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="meal-time">Meal:</label>
+                        <select id="meal-time" required>
+                            <option value="breakfast">Breakfast</option>
+                            <option value="lunch">Lunch</option>
+                            <option value="dinner">Dinner</option>
+                            <option value="snacks">Snacks</option>
+                        </select>
+                    </div>
+                    <button type="submit">Add Food</button>
+                </form>
+
+                <!-- Meal Sections -->
+                <div class="meal-section">
+                    <h3>Breakfast</h3>
+                    <div id="breakfast-items"></div>
+                    <p id="breakfast-total">0 cal | P: 0g | C: 0g | F: 0g</p>
+                </div>
+                <div class="meal-section">
+                    <h3>Lunch</h3>
+                    <div id="lunch-items"></div>
+                    <p id="lunch-total">0 cal | P: 0g | C: 0g | F: 0g</p>
+                </div>
+                <div class="meal-section">
+                    <h3>Dinner</h3>
+                    <div id="dinner-items"></div>
+                    <p id="dinner-total">0 cal | P: 0g | C: 0g | F: 0g</p>
+                </div>
+                <div class="meal-section">
+                    <h3>Snacks</h3>
+                    <div id="snacks-items"></div>
+                    <p id="snacks-total">0 cal | P: 0g | C: 0g | F: 0g</p>
+                </div>
+            </div>
+
+            <!-- Exercise Tracking -->
+            <div class="card">
+                <h2>Exercise Tracking</h2>
+                <form id="exercise-form">
+                    <div class="form-group">
+                        <label for="exercise">Exercise:</label>
+                        <input type="text" id="exercise" list="exercise-list" required>
+                        <datalist id="exercise-list"></datalist>
+                    </div>
+                    <div class="form-group">
+                        <label for="duration">Duration (minutes):</label>
+                        <input type="number" id="duration" required min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="intensity">Intensity:</label>
+                        <select id="intensity" required>
+                            <option value="low">Low</option>
+                            <option value="moderate">Moderate</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <button type="submit">Add Exercise</button>
+                </form>
+                <div id="exercise-items"></div>
+            </div>
+
+            <!-- Daily Summary -->
+            <div class="card">
+                <h2>Daily Summary</h2>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                    <div>
+                        <h3>Calories</h3>
+                        <p>Consumed: <span id="calories-consumed">0</span></p>
+                        <p>Burned: <span id="calories-burned">0</span></p>
+                        <p>Net: <span id="net-calories">0</span></p>
+                        <p>Remaining: <span id="calories-remaining">0</span></p>
+                    </div>
+                    <div>
+                        <h3>Macros Progress</h3>
+                        <div class="macro-progress" id="protein-progress">
+                            <div class="macro-label">
+                                <span>Protein</span>
+                                <span>0g / 0g</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                        </div>
+                        <div class="macro-progress" id="carbs-progress">
+                            <div class="macro-label">
+                                <span>Carbs</span>
+                                <span>0g / 0g</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                        </div>
+                        <div class="macro-progress" id="fat-progress">
+                            <div class="macro-label">
+                                <span>Fat</span>
+                                <span>0g / 0g</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Database files -->
+    <script src="js/foodDatabase.js"></script>
+    <script src="js/exerciseDatabase.js"></script>
+    
+    <!-- Main tracker functionality -->
+    <script src="js/fitness-tracker.js"></script>
+</body>
+</html>
